@@ -2,6 +2,7 @@
 using Store.Date.Context;
 using Store.Date.Entities;
 using Store.Repository.Interfaces;
+using Store.Repository.Specifications;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,14 +29,23 @@ namespace Store.Repository.Repositories
         public async Task<IReadOnlyList<TEntity>> GetAllAsync()
         => await context.Set<TEntity>().ToListAsync();
 
-        //public async Task<TEntity> GetByIdAsNoTrackingAsync(TKey? id)
-        //=> await context.Set<TEntity>().AsNoTracking().FirstOrDefault(x=>x.Id==id);
-
         public async Task<TEntity> GetByIdAsync(TKey? id)
         => await context.Set<TEntity>().FindAsync(id);
 
         public void Update(TEntity entity)
         =>  context.Set<TEntity>().Update(entity);
+
+
+        //Specifications
+        public async Task<IReadOnlyList<TEntity>> GetAllWithSpecificationAsync(ISpecification<TEntity> specs)
+        =>await ApplySpecification(specs).ToListAsync();
+        public async Task<TEntity> GetWithSpecificationByIdAsync(ISpecification<TEntity> specs)
+        => await ApplySpecification(specs).FirstOrDefaultAsync();
+        private IQueryable<TEntity> ApplySpecification(ISpecification<TEntity> specs)
+        => SpecificationEvaluator<TEntity, TKey>.GetQuery(context.Set<TEntity>(), specs);
+
+        public async Task<int> GetCountSpecificationAsync(ISpecification<TEntity> specs)
+        => await ApplySpecification(specs).CountAsync();
     }
 }
 

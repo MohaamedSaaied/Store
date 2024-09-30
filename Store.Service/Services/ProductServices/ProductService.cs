@@ -9,6 +9,8 @@ using ProductEntity = Store.Date.Entities.Product;
 using Store.Service.Services.ProductServices;
 using Store.Service.Services.ProductServices.Dtos;
 using AutoMapper;
+using Store.Repository.Specifications.ProductSpecs;
+using Store.Service.Helper;
 
 
 namespace Store.Services.ProductServices
@@ -30,11 +32,14 @@ namespace Store.Services.ProductServices
             return mappedBrands;
         }
 
-        public async Task<IReadOnlyList<ProductDetailsDto>> GetAllProductsAsync()
+        public async Task<PaginatedResultDto<ProductDetailsDto>> GetAllProductsAsync(ProductSpecification input)
         {
-            var products = await unitOfwork.Repository<ProductEntity, int>().GetAllAsNoTrackingAsync();
+            var specs=new ProductWithSpecifications(input);
+            var products = await unitOfwork.Repository<ProductEntity, int>().GetAllWithSpecificationAsync(specs);
+            var countSpecs = new ProductWithCountSpecifications(input);
+            var count = await unitOfwork.Repository<ProductEntity, int>().GetCountSpecificationAsync(countSpecs);
             var mappedProducts = mapper.Map < IReadOnlyList < ProductDetailsDto >>(products);
-            return mappedProducts;
+            return new PaginatedResultDto<ProductDetailsDto>(input.PageSize,input.PageIndex,count,mappedProducts);
         }
 
         public async Task<IReadOnlyList<BrandTypeDetailsDto>> GetAllTypesAsync()
@@ -48,7 +53,11 @@ namespace Store.Services.ProductServices
         {
             if (productId is null) throw new Exception("Id is Null");
 
-            var products = await unitOfwork.Repository<ProductEntity, int>().GetByIdAsync(productId.Value);
+            var specs= new ProductWithSpecifications(productId);
+
+
+            var products = await unitOfwork.Repository<ProductEntity, int>().GetWithSpecificationByIdAsync(specs);
+            
             if (products == null) throw new Exception("Product Not Found");
             var mappedProduct = mapper.Map<ProductDetailsDto>(products);
             return mappedProduct;
