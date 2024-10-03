@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Store.Repository.Specifications.ProductSpecs;
 using Store.Service.Services.ProductServices;
 using Store.Service.Services.ProductServices.Dtos;
+using Store.Web.Helper;
 
 namespace Store.Web.Controllers
 {
@@ -23,16 +24,17 @@ namespace Store.Web.Controllers
 
         [HttpGet]
         public async Task<ActionResult<IReadOnlyList<BrandTypeDetailsDto>>> GetAllTypes()
-    => Ok(await productService.GetAllTypesAsync());
+            => Ok(await productService.GetAllTypesAsync());
 
 
         [HttpGet]
+        [Cache(10)]
         public async Task<ActionResult<IReadOnlyList<ProductDetailsDto>>> GetAllProducts([FromQuery]ProductSpecification input)
-    => Ok(await productService.GetAllProductsAsync(input));
+            => Ok(await productService.GetAllProductsAsync(input));
 
 
         [HttpGet]
         public async Task<ActionResult<ProductDetailsDto>> GetProductById(int? id)
-    => Ok(await productService.GetProductByIdAsync(id));
+            => Ok(await productService.GetProductByIdAsync(id));
     }
 }
