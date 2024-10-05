@@ -33,6 +33,12 @@ namespace Store.Web
 
             });
 
+            builder.Services.AddDbContext<StoreIdentityDbContext>(options =>
+            {
+                options.UseSqlServer(builder.Configuration.GetConnectionString("IdentityConnection"));
+
+            });
+
             builder.Services.AddSingleton<IConnectionMultiplexer>(config =>
             {
                 var configration = ConfigurationOptions.Parse(builder.Configuration.GetConnectionString("Redis"));
@@ -40,6 +46,8 @@ namespace Store.Web
             });
 
             builder.Services.AddApplicationServices();
+
+            builder.Services.AddIdentityServices();
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -59,6 +67,8 @@ namespace Store.Web
             app.UseHttpsRedirection();
 
             app.UseStaticFiles();
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 

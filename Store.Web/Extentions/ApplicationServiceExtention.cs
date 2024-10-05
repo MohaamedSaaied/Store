@@ -7,6 +7,9 @@ using Store.Services.ProductServices;
 using Store.Service.HandelResponses;
 using Store.Service.Services.CachServices;
 using Store.Service.Services.CacheServices;
+using Store.Service.Services.BasketServices.Dtos;
+using Store.Service.Services.BasketServices;
+using Store.Repository.Basket;
 
 namespace Store.Web.Extentions
 {
@@ -17,8 +20,10 @@ namespace Store.Web.Extentions
             services.AddScoped<IUnitOfwork, UnitOfWork>();
             services.AddScoped<IProductService, ProductService>();
             services.AddScoped<ICacheService, CacheService>();
+            services.AddScoped<IBasketService, BasketService>();
+            services.AddScoped<IBasketRepository, BasketRepository>();
             services.AddAutoMapper(typeof(ProductProfile));
-            
+            services.AddAutoMapper(typeof(BasketProfile));
 
             services.Configure<ApiBehaviorOptions>(options =>
             {

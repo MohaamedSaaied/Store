@@ -43,6 +43,18 @@ namespace Store.Repository
                         await DB.Products.AddRangeAsync(products);
                     }
                 }
+
+                if (DB.DeliveryMethods != null && !DB.DeliveryMethods.Any())
+                {
+                    var deliveryMethodsData = File.ReadAllText("../Store.Repository/SeedData/delivery.json");
+                    var deliveryMethods = JsonSerializer.Deserialize<List<DeliveryMethod>>(deliveryMethodsData);
+                    if (deliveryMethods is not null)
+                    {
+                        await DB.DeliveryMethods.AddRangeAsync(deliveryMethods);
+                        await DB.SaveChangesAsync();
+                    }
+                }
+
             }
             catch (Exception exception) 
             { 
