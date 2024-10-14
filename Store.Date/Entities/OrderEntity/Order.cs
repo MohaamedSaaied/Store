@@ -12,7 +12,7 @@ namespace Store.Date.Entities.OrderEntity
         public DateTimeOffset OrderDate { get; set; } = DateTimeOffset.Now;
         public ShippingAdress ShippingAdress { get; set; }
         public DeliveryMethod DeliveryMethod { get; set; }
-        public int? DeliveyMethodId { get; set; }
+        public int? DeliveryMethodId { get; set; }
         public OrderStatus OrderStatus { get; set; } = OrderStatus.Placed;
         public OrderPaymentStatus OrderPaymentStatus { get; set; } = OrderPaymentStatus.Pending;
         public IReadOnlyList<OrderItem>OrderItems { get; set; }

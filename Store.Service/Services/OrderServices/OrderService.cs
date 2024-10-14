@@ -68,8 +68,8 @@ namespace Store.Service.Services.OrderServices
             #endregion
 
             #region GetDelivery Method
-            var deliverMethod = await _unitOfwork.Repository<DeliveryMethod, int>().GetByIdAsync(input.DeliveryMethodId);
-            if (deliverMethod is null)
+            var deliveryMethod = await _unitOfwork.Repository<DeliveryMethod, int>().GetByIdAsync(input.DeliveryMethodId);
+            if (deliveryMethod is null)
                 throw new Exception("Delivery Method Isn't provided");
             #endregion
 
@@ -94,7 +94,7 @@ namespace Store.Service.Services.OrderServices
             var mappedOrderItems = _mapper.Map<List<OrderItem>>(orderItems);
             var order = new Date.Entities.OrderEntity.Order
             {
-                DeliveyMethodId = deliverMethod.Id,
+                DeliveryMethodId = deliveryMethod.Id,
                 ShippingAdress = mappedShippingAdress,
                 BuyerEmail = input.BuyerEmail,
                 BasketId = input.BasketId,
