@@ -33,7 +33,7 @@ namespace Store.Service.Services.PaymentServices
         }
         public async Task<CustomerBasketDto> CreateOrUpdatePayment(CustomerBasketDto basket)
         {
-            StripeConfiguration.ApiKey = _configuration["Strip:Secretkey"];
+            StripeConfiguration.ApiKey = _configuration["Stripe:Secretkey"];
 
             if(basket is null)
                 throw new Exception("Basket Is Empty");

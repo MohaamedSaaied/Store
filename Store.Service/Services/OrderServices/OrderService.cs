@@ -6,11 +6,15 @@ using Store.Repository.Interfaces;
 using Store.Repository.Specifications.OrderSpecs;
 using Store.Service.Services.BasketServices;
 using Store.Service.Services.OrderServices.Dtos;
+using Store.Service.Services.PaymentServices;
+using Stripe;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Order = Store.Date.Entities.OrderEntity.Order;
+using Product = Store.Date.Entities.Product;
 
 namespace Store.Service.Services.OrderServices
 {
@@ -19,12 +23,14 @@ namespace Store.Service.Services.OrderServices
         private readonly IBasketService _basketService;
         private readonly IUnitOfwork _unitOfwork;
         private readonly IMapper _mapper;
+        private readonly IPaymentService _paymentService;
 
-        public OrderService(IBasketService basketService,IUnitOfwork unitOfwork,IMapper mapper)
+        public OrderService(IBasketService basketService,IUnitOfwork unitOfwork,IMapper mapper,IPaymentService paymentService)
         {
             _basketService = basketService;
             _unitOfwork = unitOfwork;
             _mapper = mapper;
+            _paymentService = paymentService;
         }
         public async Task<OrderDetailsdto> CreateOrderAsync(OrderDto input)
         {
@@ -73,6 +79,13 @@ namespace Store.Service.Services.OrderServices
 
             #region To Do => Payment
 
+            var specs = new OrderWithPaymentIntentSpecification(basket.PaymentIntentId);
+            var existingOrder = await _unitOfwork.Repository<Order, Guid>().GetWithSpecificationByIdAsync(specs);
+
+            if(existingOrder is null)
+                await _paymentService.CreateOrUpdatePayment(basket);
+            
+
             #endregion
 
             #region Create Order
@@ -86,7 +99,8 @@ namespace Store.Service.Services.OrderServices
                 BuyerEmail = input.BuyerEmail,
                 BasketId = input.BasketId,
                 OrderItems = mappedOrderItems,
-                SubTotal = subTotal
+                SubTotal = subTotal,
+                PaymentIntentId=basket.PaymentIntentId
             };
             await _unitOfwork.Repository<Date.Entities.OrderEntity.Order,Guid>().AddAsync(order);
 
